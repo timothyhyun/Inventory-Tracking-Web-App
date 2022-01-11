@@ -74,7 +74,7 @@ def connect():
 
 def main():
     server.listen(MAX_CONNETIONS)
-    print("Waiting for Connections")
+    print("Waiting for Connections...")
     accept = Thread(target=connect)
     accept.start()
     accept.join()
@@ -83,5 +83,5 @@ def main():
 
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()
