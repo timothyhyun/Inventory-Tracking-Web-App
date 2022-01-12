@@ -56,3 +56,4 @@ class Client:
                 self.socket.close()
         except Exception as e:
             print("Error", e)
+            
