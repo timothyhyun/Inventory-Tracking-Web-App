@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, redirect, request, session, j
 from client import Client
 from threading import Thread
 import time
-
+import json
 
 client = None
 inventory = []
@@ -19,7 +19,6 @@ def disconnect_client():
         client.addInventory("close")
 
 
-
 def background():
     global inventory
     run = True
@@ -30,12 +29,57 @@ def background():
             break
         if not client:
             continue
-        inventory = client.getInventory()
-        for item in inventory:
+        inv = client.getInventory()
+        for item in inv:
             if item == "close":
                 run = False
                 break
+        inventory = inv
 
+
+#base off SKU number
+
+@app.route("/addInventory")
+def add_inventory():
+    global client
+    date = ""
+    quantity = 0
+    sku = ""
+    comments = ""
+    if quantity <= 0 or sku < 0:
+        # invalid input
+        return
+    inv = client.getInventory()
+    for item in inv:
+        if sku == item[1]:
+            # invalid input
+            return
+    temp = [date, sku, quantity, comments]
+    client.addInventory(json.dumps(temp)) 
+
+@app.route("/editInventory")
+def edit_inventory():
+    global client
+    date = ""
+    quantity = 0
+    sku = ""
+    comments = ""
+    if client.editInventory(date, sku, quantity, comments) == "Invalid Input":
+        pass
+
+@app.route("/deleteInventory")
+def delete_inventory():
+    global client
+    sku = ""    
+    if client.deleteInventory(sku) == "Invalid Input":
+        pass
+
+
+# Date, Name, Quantity, SKU, Comments
+
+
+def get_inventory():
+    pass
 
 
 @app.route("/home")
