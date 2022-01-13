@@ -20,14 +20,39 @@ def disconnect_client():
 
 
 
+def background():
+    global inventory
+    run = True
+    while run:
+        time.sleep(0.1)
+        if key not in session:
+            disconnect_client()
+            break
+        if not client:
+            continue
+        inventory = client.getInventory()
+        for item in inventory:
+            if item == "close":
+                run = False
+                break
 
+
+
+@app.route("/home")
 @app.route("/", methods=["POST","GET"])
 def index():
     global client
+    global id
     if key not in session:
-        pass
-    else:
-        return render_template("index.html")
+        disconnect_client()
+        if request.method == "POST":
+            session[key] = id
+            id += 1
+        else:
+            redirect(url_for("home"))
+    client = Client()
+    return render_template("index.html")
 
-#somehow create background task, if id not in session, close socket
-#not sure hwo to do 
+if __name__ == "__main__":
+    Thread(target=background).start()
+    app.run(debug=True)

@@ -5,6 +5,8 @@ from threading import Thread, Lock
 import time
 import json
 
+from werkzeug.datastructures import D
+
 
 
 
@@ -56,4 +58,6 @@ class Client:
                 self.socket.close()
         except Exception as e:
             print("Error", e)
-            
+    
+    def getInventory(self, message):
+        return self.inventory
