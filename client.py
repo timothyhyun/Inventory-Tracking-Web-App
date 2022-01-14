@@ -72,10 +72,19 @@ class Client:
         except Exception as e:
             print("Error", e)
     
-    def getInventory(self, message):
+    def getInventory(self):
+        """
+        gets total inventory 
+        :return: list of list
+        """
         return self.inventory
 
     def editInventory(self, date, sku, quantity, comments):
+        """
+        sends message to edit inventory with updated items
+        :param data, sky, quantity, comments: str
+        :return: status of the inputs
+        """
         if quantity < 0:
             return "Invalid Input"
         inv = self.getInventory()
@@ -106,7 +115,12 @@ class Client:
         
     
     def deleteInventory (self, sku):
-        inv = self.getInventory
+        """
+        sends inventory update to server
+        :param sku:str
+        :return: 
+        """
+        inv = self.getInventory()
         for i in range(len(inv)):
             if inv[i][1] == sku:
                 self.socket.send(bytes(f"delete{i}", "utf8"))

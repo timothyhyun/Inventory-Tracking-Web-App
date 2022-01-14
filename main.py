@@ -43,10 +43,10 @@ def background():
 def add_inventory():
     global client
     date = ""
-    quantity = 0
+    quantity = ""
     sku = ""
     comments = ""
-    if quantity <= 0 or sku < 0:
+    if int(quantity) <= 0 or sku == "":
         # invalid input
         return
     inv = client.getInventory()
@@ -55,13 +55,16 @@ def add_inventory():
             # invalid input
             return
     temp = [date, sku, quantity, comments]
-    client.addInventory(json.dumps(temp)) 
+    if client:
+        client.addInventory(json.dumps(temp)) 
+    return "none"
+
 
 @app.route("/editInventory")
 def edit_inventory():
     global client
     date = ""
-    quantity = 0
+    quantity = ""
     sku = ""
     comments = ""
     if client.editInventory(date, sku, quantity, comments) == "Invalid Input":
@@ -79,7 +82,7 @@ def delete_inventory():
 
 
 def get_inventory():
-    pass
+    return jsonify({"inventory":inventory})
 
 
 @app.route("/home")
@@ -89,11 +92,8 @@ def index():
     global id
     if key not in session:
         disconnect_client()
-        if request.method == "POST":
-            session[key] = id
-            id += 1
-        else:
-            redirect(url_for("home"))
+        session[key] = id
+        id += 1
     client = Client()
     return render_template("index.html")
 
