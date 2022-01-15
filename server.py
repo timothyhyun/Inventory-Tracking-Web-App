@@ -8,7 +8,7 @@ import time
 
 
 # Global Constants
-HOST = 'localhost'
+HOST = "localhost"
 PORT = 5500
 ADDR = (HOST, PORT)
 MAX_CONNETIONS = 10
@@ -47,11 +47,13 @@ def communicate(client, addr):
                 client.close()
                 clients.remove((client, addr))
                 print("A client has disconnected")
+                break
             else:
                 send_message(message)
                 print("Message Sent:", message.decode("utf8"))
         except Exception as err:
             print("Error", err)
+            break
 
 
 

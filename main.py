@@ -1,3 +1,4 @@
+import re
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify
 from client import Client
 from threading import Thread
@@ -16,6 +17,7 @@ key = "id"
 def disconnect_client():
     global client
     if client:
+        print("disconnecting client")
         client.addInventory("close")
 
 
@@ -24,11 +26,12 @@ def background():
     run = True
     while run:
         time.sleep(0.1)
+        if not client:
+            continue
+        print("connected")
         if key not in session:
             disconnect_client()
             break
-        if not client:
-            continue
         inv = client.getInventory()
         for item in inv:
             if item == "close":
@@ -42,38 +45,48 @@ def background():
 @app.route("/addInventory")
 def add_inventory():
     global client
-    date = ""
-    quantity = ""
-    sku = ""
-    comments = ""
-    if int(quantity) <= 0 or sku == "":
-        # invalid input
-        return
-    inv = client.getInventory()
-    for item in inv:
-        if sku == item[1]:
+    date = request.args.get("date")
+    quantity = request.args.get("quantity")
+    sku = request.args.get("sku")
+    comments = request.args.get("comments")
+    try:
+        if int(quantity) <= 0 or sku == "":
             # invalid input
             return
-    temp = [date, sku, quantity, comments]
-    if client:
-        client.addInventory(json.dumps(temp)) 
-    return "none"
+        inv = client.getInventory()
+        for item in inv:
+            if sku == item[1]:
+                # invalid input
+                return
+        temp = [date, sku, quantity, comments]
+        if client:
+            print(temp)
+            client.addInventory(json.dumps(temp)) 
+        return "none"
+    except Exception as err:
+        print("Error", err)
+        return "Error"
 
 
 @app.route("/editInventory")
 def edit_inventory():
     global client
-    date = ""
-    quantity = ""
-    sku = ""
-    comments = ""
+    date = request.args.get("date")
+    quantity = request.args.get("quantity")
+    sku = request.args.get("sku")
+    comments = request.args.get("comments")
+    try:
+        int(quantity)
+    except Exception as err:
+        print("Error", err)
+        return "Error"
     if client.editInventory(date, sku, quantity, comments) == "Invalid Input":
         pass
 
 @app.route("/deleteInventory")
 def delete_inventory():
     global client
-    sku = ""    
+    sku = request.args.get("sku")  
     if client.deleteInventory(sku) == "Invalid Input":
         pass
 
@@ -85,17 +98,29 @@ def get_inventory():
     return jsonify({"inventory":inventory})
 
 
+@app.route("/")
 @app.route("/home")
-@app.route("/", methods=["POST","GET"])
-def index():
+def home():
     global client
-    global id
     if key not in session:
-        disconnect_client()
-        session[key] = id
-        id += 1
+        return redirect(url_for("log"))
     client = Client()
     return render_template("index.html")
+
+
+@app.route("/log", methods=["POST","GET"])
+def log():
+    print(request.method)
+    global id
+    disconnect_client()
+    session[key] = id
+    id += 1
+    return redirect(url_for("home"))
+        
+    
+        
+
+
 
 if __name__ == "__main__":
     Thread(target=background).start()
