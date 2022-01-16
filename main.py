@@ -77,7 +77,8 @@ def edit_inventory():
     sku = request.args.get("sku")
     comments = request.args.get("comments")
     try:
-        int(quantity)
+        if len(quantity) > 0:
+            int(quantity)
     except Exception as err:
         print("Error", err)
         return "Error"

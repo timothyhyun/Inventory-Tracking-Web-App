@@ -57,7 +57,7 @@ $(function() {
         var valueSKU = deletesku.value
         deletesku.value = ""
 
-        $.getJSON('/addInventory',
+        $.getJSON('/deleteInventory',
             {sku: valueSKU},
             function(data) {
 
