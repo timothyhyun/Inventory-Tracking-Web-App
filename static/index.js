@@ -67,9 +67,6 @@ $(function() {
 
 
 
-
-
-
 window.onload = function (){
     var update_loop = setInterval(updateTable, 100);
     updateTable()
@@ -96,3 +93,38 @@ function updateTable(){
 
             });
 };
+
+
+
+function download_to_csv() {
+
+	var csv = [];
+
+	var rows = document.getElementsByTagName('tr');
+	for (var i = 0; i < rows.length; i++) {
+		var cols = rows[i].querySelectorAll('td,th');
+		var csvrow = [];
+		for (var j = 0; j < cols.length; j++) {
+			csvrow.push(cols[j].innerHTML);
+		}
+
+		csv.push(csvrow.join(","));
+	}
+	csv= csv.join('\n');
+
+    CSVFile = new Blob([csv], { type: "text/csv" });
+ 
+    var temp_link = document.createElement('a');
+ 
+    temp_link.download = "inventory.csv";
+    var url = window.URL.createObjectURL(CSVFile);
+    temp_link.href = url;
+ 
+    temp_link.style.display = "none";
+    document.body.appendChild(temp_link);
+
+    temp_link.click();
+    document.body.removeChild(temp_link);
+}
+
+

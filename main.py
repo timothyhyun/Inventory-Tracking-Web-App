@@ -24,17 +24,21 @@ def disconnect_client():
 def background():
     global inventory
     run = True
+    counter = 0
     while run:
         time.sleep(0.1)
         if not client:
             continue
-        
         inv = client.getInventory()
         for item in inv:
             if item == "close":
                 run = False
                 break
         inventory = inv
+        counter += 1
+        if (counter % 10 == 0):
+            download_inventory()
+
 
 
 #base off SKU number
@@ -44,10 +48,10 @@ def add_inventory():
     global client
     if client == None:
         return "Error"
-    name = request.args.get("name")
-    quantity = request.args.get("quantity")
-    sku = request.args.get("sku")
-    comments = request.args.get("comments")
+    name = request.args.get("name").strip()
+    quantity = request.args.get("quantity").strip()
+    sku = request.args.get("sku").strip()
+    comments = request.args.get("comments").strip()
     try:
         if int(quantity) <= 0 or sku == "":
             # invalid input
@@ -104,19 +108,44 @@ def get_inventory():
     return jsonify({"inventory":inventory})
 
 
+
+@app.route("/download_inventory")
+def download_inventory():
+    global inventory
+    jsonString = json.dumps(inventory)
+    jsonFile = open("inventory.json", "w")
+    jsonFile.truncate()
+    jsonFile.write(jsonString)
+    jsonFile.close()
+
+
+
+@app.route("/load_inventory")
+def load_inventory():
+    jsonFile = open("inventory.json", "r")
+    jsonContent = jsonFile.read()
+    res = json.loads(jsonContent)
+    jsonFile.close()
+    return res
+        
+
+
+
+
 @app.route("/")
 @app.route("/home")
 def home():
     global client
+    global inventory
     if key not in session:
         return redirect(url_for("log"))
     client = Client()
+    inventory = load_inventory()
     return render_template("index.html")
 
 
 @app.route("/log", methods=["POST","GET"])
 def log():
-    print(request.method)
     global id
     disconnect_client()
     session[key] = id
@@ -124,7 +153,7 @@ def log():
     return redirect(url_for("home"))
         
     
-        
+
 
 
 

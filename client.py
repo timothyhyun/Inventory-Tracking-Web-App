@@ -11,7 +11,7 @@ from werkzeug.utils import invalidate_cached_property
 
 class Client:
     #self.inventory: list of lists
-    
+    #73.174.153.49
 
     HOST = "localhost"
     PORT = 5500
