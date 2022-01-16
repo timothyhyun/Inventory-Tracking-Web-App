@@ -1,8 +1,8 @@
 $(function() {
     $('#addItem').bind('click', function() {
-        var adddate = document.getElementById("addDate")
-        var valueDate = adddate.value
-        adddate.value = ""
+        var addname = document.getElementById("addName")
+        var valueName = addname.value
+        addname.value = ""
 
         var addsku = document.getElementById("addSKU")
         var valueSKU = addsku.value
@@ -17,7 +17,7 @@ $(function() {
         addcomments.value = ""
 
         $.getJSON('/addInventory',
-            {date:valueDate, sku: valueSKU, quantity:valuequantity, comments:valuecomment},
+            {name:valueName, sku: valueSKU, quantity:valuequantity, comments:valuecomment},
             function(data) {
 
             });
@@ -26,9 +26,9 @@ $(function() {
 
 $(function() {
     $('#editItem').bind('click', function() {
-        var editdate = document.getElementById("editDate")
-        var valueDate = editdate.value
-        editdate.value = ""
+        var editname = document.getElementById("editName")
+        var valueName = editname.value
+        editname.value = ""
 
         var editsku = document.getElementById("editSKU")
         var valueSKU = editsku.value
@@ -43,7 +43,7 @@ $(function() {
         editcomments.value = ""
 
         $.getJSON('/editInventory',
-            {date:valueDate, sku: valueSKU, quantity:valuequantity, comments:valuecomment},
+            {name:valueName, sku: valueSKU, quantity:valuequantity, comments:valuecomment},
             function(data) {
 
             });
@@ -71,7 +71,7 @@ $(function() {
 
 
 window.onload = function (){
-    var update_loop = setInterval(update, 100);
+    var update_loop = setInterval(updateTable, 100);
     updateTable()
 };
 
@@ -81,8 +81,18 @@ function updateTable(){
                 return response.json();
             }).then(function (text) {
                 var table = document.getElementById("inventory")
+                var tableBody = document.getElementById("inventory_body")
                 // somehow clear entire table except head
                 inventory = text["inventory"]
-                
+                tableBody.innerHTML = ""
+                console.log(inventory)
+                for (let i = 0; i < inventory.length; i++){
+                    var row = tableBody.insertRow(0)
+                    for (let j = 0; j < inventory[i].length; j++){
+                        var cell = row.insertCell(-1)
+                        cell.innerHTML = inventory[i][j]
+                    }
+                }
+
             });
 };

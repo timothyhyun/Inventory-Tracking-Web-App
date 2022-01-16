@@ -39,16 +39,16 @@ class Client:
             try:
                 message = self.socket.recv(self.BUFSIZE).decode()
                 if message[:4] == "edit":
-                    index = message[5]
-                    info = json.loads(message[6:])
+                    index = message[4]
+                    info = json.loads(message[5:])
                     self.lock.acquire()
-                    self.inventory[index] = info
+                    self.inventory[int(index)] = info
                     self.lock.release()
                     continue
-                if message[:7] == "delete":
-                    index = message[8]
+                if message[:6] == "delete":
+                    index = message[6]
                     self.lock.acquire()
-                    self.inventory.pop(index)
+                    self.inventory.pop(int(index))
                     self.lock.release()
                     continue
                 self.lock.acquire()
@@ -79,23 +79,23 @@ class Client:
         """
         return self.inventory
 
-    def editInventory(self, date, sku, quantity, comments):
+    def editInventory(self, name, sku, quantity, comments):
         """
         sends message to edit inventory with updated items
         :param data, sky, quantity, comments: str
         :return: status of the inputs
         """
-        if quantity < 0:
+        if int(quantity) < 0:
             return "Invalid Input"
         inv = self.getInventory()
         for i in range(len(inv)):
             if inv[i][1] == sku:
                 # determine which fields to change
                 l = []
-                if date == "":
+                if name == "":
                     l.append(inv[i][0])
                 else:
-                    l.append(date)
+                    l.append(name)
                 l.append(sku)
                 if quantity == "":
                     l.append(inv[i][2])

@@ -28,10 +28,7 @@ def background():
         time.sleep(0.1)
         if not client:
             continue
-        print("connected")
-        if key not in session:
-            disconnect_client()
-            break
+        
         inv = client.getInventory()
         for item in inv:
             if item == "close":
@@ -45,20 +42,22 @@ def background():
 @app.route("/addInventory")
 def add_inventory():
     global client
-    date = request.args.get("date")
+    if client == None:
+        return "Error"
+    name = request.args.get("name")
     quantity = request.args.get("quantity")
     sku = request.args.get("sku")
     comments = request.args.get("comments")
     try:
         if int(quantity) <= 0 or sku == "":
             # invalid input
-            return
+            return "Error"
         inv = client.getInventory()
         for item in inv:
             if sku == item[1]:
                 # invalid input
-                return
-        temp = [date, sku, quantity, comments]
+                return "Error"
+        temp = [name, sku, quantity, comments]
         if client:
             print(temp)
             client.addInventory(json.dumps(temp)) 
@@ -71,7 +70,9 @@ def add_inventory():
 @app.route("/editInventory")
 def edit_inventory():
     global client
-    date = request.args.get("date")
+    if client == None:
+        return "Error"
+    name = request.args.get("name")
     quantity = request.args.get("quantity")
     sku = request.args.get("sku")
     comments = request.args.get("comments")
@@ -80,20 +81,24 @@ def edit_inventory():
     except Exception as err:
         print("Error", err)
         return "Error"
-    if client.editInventory(date, sku, quantity, comments) == "Invalid Input":
-        pass
+    if client.editInventory(name, sku, quantity, comments) == "Invalid Input":
+        return "Error"
+    return "none"
 
 @app.route("/deleteInventory")
 def delete_inventory():
     global client
+    if client == None:
+        return "Error"
     sku = request.args.get("sku")  
     if client.deleteInventory(sku) == "Invalid Input":
-        pass
+        return "Error"
+    return "none"
 
 
-# Date, Name, Quantity, SKU, Comments
+# Name, Quantity, SKU, Comments
 
-
+@app.route("/get_inventory")
 def get_inventory():
     return jsonify({"inventory":inventory})
 
