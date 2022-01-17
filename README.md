@@ -13,7 +13,7 @@ I used threading and sockets to allow multiple users to use the app simulatenous
 
 Ensure Python 3.6+ is installed on the device. 
 
-To clear all previous inventory data, clear the inventory.json file
+Clone and Navigate to the Repository
 
 ```bash
 pip install -r requirements.txt
@@ -27,6 +27,8 @@ py main.py
 ```
 Go to http://localhost:5000
 
+
 ## Optional: 
 
+To clear all previous inventory data, clear the inventory.json file
 To access the program from another device, change hostname in server.py to '' and in client.py to the device's private IP address
