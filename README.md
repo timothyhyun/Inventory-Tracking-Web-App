@@ -13,15 +13,15 @@ I used threading and sockets to allow multiple users to use the app simulatenous
 
 Ensure Python 3.6+ is installed on the device
 
-'''bash
+```bash
 pip install -r requirements.txt
-'''
+```
 
 ## Execution: 
-'''bash 
+```bash 
 py server.py
 py main.py
-'''
+```
 Go to http://localhost:5000
 
 ## Optional: 
