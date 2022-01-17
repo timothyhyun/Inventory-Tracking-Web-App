@@ -52,7 +52,7 @@ def communicate(client, addr):
                 send_message(message)
                 print("Message Sent:", message.decode("utf8"))
         except Exception as err:
-            print("Error", err)
+            print("Error:", err)
             break
 
 
@@ -70,7 +70,7 @@ def connect():
             print(f"{addr} connected to server at {time.time()}")
             Thread(target=communicate, args=(client, addr)).start()
         except Exception as err:
-            print("Error", err)
+            print("Error:", err)
             break
 
 

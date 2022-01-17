@@ -15,6 +15,10 @@ key = "id"
 
 
 def disconnect_client():
+    """
+    closes socket
+    :return: None
+    """
     global client
     if client:
         print("disconnecting client")
@@ -22,9 +26,12 @@ def disconnect_client():
 
 
 def background():
+    """
+    runs in the background to update inventory from server
+    :return: None
+    """
     global inventory
     run = True
-    counter = 0
     while run:
         time.sleep(0.1)
         if not client:
@@ -35,9 +42,6 @@ def background():
                 run = False
                 break
         inventory = inv
-        counter += 1
-        if (counter % 10 == 0):
-            download_inventory()
 
 
 
@@ -45,6 +49,10 @@ def background():
 
 @app.route("/addInventory")
 def add_inventory():
+    """
+    sends request to server to add item to inventory
+    :return: None
+    """
     global client
     if client == None:
         return "Error"
@@ -63,7 +71,6 @@ def add_inventory():
                 return "Error"
         temp = [name, sku, quantity, comments]
         if client:
-            print(temp)
             client.addInventory(json.dumps(temp)) 
         return "none"
     except Exception as err:
@@ -73,6 +80,10 @@ def add_inventory():
 
 @app.route("/editInventory")
 def edit_inventory():
+    """
+    sends request to server to edit item in inventory
+    :return: status of request
+    """
     global client
     if client == None:
         return "Error"
@@ -92,6 +103,10 @@ def edit_inventory():
 
 @app.route("/deleteInventory")
 def delete_inventory():
+    """
+    sends request to server to delete an item in the inventory
+    :return: status of request
+    """
     global client
     if client == None:
         return "Error"
@@ -105,29 +120,11 @@ def delete_inventory():
 
 @app.route("/get_inventory")
 def get_inventory():
+    """
+    sends inventory to javascript to load on the website
+    :return: json representation of inventory
+    """
     return jsonify({"inventory":inventory})
-
-
-
-@app.route("/download_inventory")
-def download_inventory():
-    global inventory
-    jsonString = json.dumps(inventory)
-    jsonFile = open("inventory.json", "w")
-    jsonFile.truncate()
-    jsonFile.write(jsonString)
-    jsonFile.close()
-
-
-
-@app.route("/load_inventory")
-def load_inventory():
-    jsonFile = open("inventory.json", "r")
-    jsonContent = jsonFile.read()
-    res = json.loads(jsonContent)
-    jsonFile.close()
-    return res
-        
 
 
 
@@ -135,26 +132,30 @@ def load_inventory():
 @app.route("/")
 @app.route("/home")
 def home():
+    """
+    checks if a session is running and then render website
+    :return: None
+    """
     global client
     global inventory
     if key not in session:
         return redirect(url_for("log"))
     client = Client()
-    inventory = load_inventory()
     return render_template("index.html")
 
 
-@app.route("/log", methods=["POST","GET"])
+@app.route("/log")
 def log():
+    """
+    creates a new client and connects it to the server 
+    :return: redirect for home page
+    """
     global id
     disconnect_client()
     session[key] = id
     id += 1
     return redirect(url_for("home"))
         
-    
-
-
 
 
 if __name__ == "__main__":

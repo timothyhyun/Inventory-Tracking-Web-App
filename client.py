@@ -2,7 +2,6 @@
 
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread, Lock
-import time
 import json
 from werkzeug.datastructures import RequestCacheControl
 
@@ -11,8 +10,6 @@ from werkzeug.utils import invalidate_cached_property
 
 class Client:
     #self.inventory: list of lists
-    #73.174.153.49
-
     HOST = "localhost"
     PORT = 5500
     ADDR = (HOST, PORT)
@@ -25,10 +22,19 @@ class Client:
         """
         self.socket = socket(AF_INET, SOCK_STREAM)
         self.socket.connect(self.ADDR)
-        self.inventory = []
+        # loads inventory from stored json file
+        self.lock = Lock()
+        self.lock.acquire()
+        jsonFile = open("inventory.json", "r")
+        jsonContent = jsonFile.read()
+        res = json.loads(jsonContent)
+        jsonFile.close()
+        self.inventory = res
+        self.lock.release()
+        # continously updates inventory by receiving requests
         receive_thread = Thread(target=self.updateInventory)
         receive_thread.start()
-        self.lock = Lock()
+        
 
     def updateInventory(self):
         """
@@ -38,25 +44,33 @@ class Client:
         while True: 
             try:
                 message = self.socket.recv(self.BUFSIZE).decode()
+                # updates inventory based after receiving request
                 if message[:4] == "edit":
                     index = message[4]
                     info = json.loads(message[5:])
                     self.lock.acquire()
                     self.inventory[int(index)] = info
                     self.lock.release()
-                    continue
-                if message[:6] == "delete":
+                elif message[:6] == "delete":
                     index = message[6]
                     self.lock.acquire()
                     self.inventory.pop(int(index))
                     self.lock.release()
-                    continue
+                else:
+                    self.lock.acquire()
+                    info = json.loads(message)
+                    self.inventory.append(info)
+                    self.lock.release()
                 self.lock.acquire()
-                info = json.loads(message)
-                self.inventory.append(info)
+                # updates json file
+                jsonString = json.dumps(self.inventory)
+                jsonFile = open("inventory.json", "w")
+                jsonFile.truncate()
+                jsonFile.write(jsonString)
+                jsonFile.close()
                 self.lock.release()
             except Exception as err:
-                print("Error", err)
+                print("Receiving Error", err)
                 break
 
     def addInventory(self, message):
