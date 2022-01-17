@@ -11,7 +11,8 @@ I used threading and sockets to allow multiple users to use the app simulatenous
 
 ## Setup:
 
-Ensure Python 3.6+ is installed on the device
+Ensure Python 3.6+ is installed on the device. 
+To clear all previous inventory data, clear the inventory.json file
 
 ```bash
 pip install -r requirements.txt
@@ -19,7 +20,7 @@ pip install -r requirements.txt
 
 ## Execution: 
 ```bash 
-py server.py
+py server.py &
 py main.py
 ```
 Go to http://localhost:5000
