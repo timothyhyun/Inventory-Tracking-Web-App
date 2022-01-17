@@ -12,6 +12,7 @@ I used threading and sockets to allow multiple users to use the app simulatenous
 ## Setup:
 
 Ensure Python 3.6+ is installed on the device. 
+
 To clear all previous inventory data, clear the inventory.json file
 
 ```bash
