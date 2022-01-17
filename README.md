@@ -1,5 +1,5 @@
 # Inventory-Tracking-Web-App
-Shopify Summer 2022 Backend Project
+Shopify Summer 2022 Backend and Infastructure Project
 
 
 ## Background: 
