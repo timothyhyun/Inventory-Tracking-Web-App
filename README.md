@@ -20,8 +20,9 @@ pip install -r requirements.txt
 ```
 
 ## Execution: 
+You will need to run these files in seperate shells. Server.py runs the server that communicates with all the clients. main.py runs the website that processes user requests
 ```bash 
-py server.py &
+py server.py
 py main.py
 ```
 Go to http://localhost:5000
